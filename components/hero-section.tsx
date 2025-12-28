@@ -2,9 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { Github, Linkedin, Mail, Phone } from "lucide-react";
-import { Raleway } from "next/font/google";
-
-const raleway = Raleway({ subsets: ["latin"] });
 
 declare global {
   interface Window {
@@ -114,10 +111,7 @@ export default function HeroSection() {
           TEJAS M
         </h1>
 
-        <div
-          className="mb-12 space-y-2 text-lg leading-relaxed text-foreground md:text-xl"
-          style={{ fontFamily: raleway.style.fontFamily }}
-        >
+        <div className="mb-12 space-y-2 text-lg leading-relaxed text-foreground md:text-xl">
           <p ref={line1Ref} className="min-h-7" />
           <p ref={line2Ref} className="min-h-7" />
           <p ref={line3Ref} className="min-h-7" />

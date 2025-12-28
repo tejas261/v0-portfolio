@@ -1,17 +1,16 @@
-"use client"
+"use client";
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef } from "react";
 
 const skills = [
-  {
-    name: "JavaScript",
-    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
-  },
   {
     name: "TypeScript",
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
   },
-  { name: "React", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
+  {
+    name: "React",
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+  },
   {
     name: "Next.js",
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
@@ -28,32 +27,48 @@ const skills = [
     name: "PostgreSQL",
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
   },
-  { name: "Python", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
-  { name: "Java", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" },
-  { name: "Git", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" },
-  { name: "Docker", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" },
+  {
+    name: "Python",
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+  },
+  {
+    name: "DevOps",
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-original.svg",
+  },
+  {
+    name: "Git",
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+  },
+  {
+    name: "Docker",
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+  },
   {
     name: "AWS",
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg",
   },
-]
+  {
+    name: "Generative & Agentic AI",
+    logo: "/openai.svg",
+  },
+];
 
 export default function SkillsSection() {
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const gridRef = useRef<HTMLDivElement>(null)
-  const mousePosition = useRef({ x: 0, y: 0 })
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const mousePosition = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      mousePosition.current = { x: e.clientX, y: e.clientY }
-    }
+      mousePosition.current = { x: e.clientX, y: e.clientY };
+    };
 
-    window.addEventListener("mousemove", handleMouseMove)
+    window.addEventListener("mousemove", handleMouseMove);
 
     const checkGSAP = setInterval(() => {
       if (window.gsap && window.ScrollTrigger) {
-        clearInterval(checkGSAP)
-        const gsap = window.gsap
+        clearInterval(checkGSAP);
+        const gsap = window.gsap;
 
         // Stagger animation for cards
         gsap.fromTo(
@@ -77,11 +92,11 @@ export default function SkillsSection() {
               trigger: gridRef.current,
               start: "top 80%",
             },
-          },
-        )
+          }
+        );
 
         // Continuous floating animation
-        const cards = gridRef.current?.children
+        const cards = gridRef.current?.children;
         if (cards) {
           Array.from(cards).forEach((card, index) => {
             gsap.to(card, {
@@ -91,17 +106,17 @@ export default function SkillsSection() {
               repeat: -1,
               yoyo: true,
               delay: index * 0.1,
-            })
-          })
+            });
+          });
         }
       }
-    }, 100)
+    }, 100);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove)
-      clearInterval(checkGSAP)
-    }
-  }, [])
+      window.removeEventListener("mousemove", handleMouseMove);
+      clearInterval(checkGSAP);
+    };
+  }, []);
 
   return (
     <section
@@ -110,11 +125,18 @@ export default function SkillsSection() {
     >
       <div className="relative w-full max-w-7xl">
         <div className="mb-16 text-center">
-          <h2 className="mb-4 font-sans text-6xl font-black tracking-tight text-white md:text-7xl">Tech Stack</h2>
-          <p className="text-lg text-muted-foreground">Technologies I work with daily</p>
+          <h2 className="mb-4 font-sans text-6xl font-black tracking-tight text-white md:text-7xl">
+            Tech Stack
+          </h2>
+          <p className="text-lg text-muted-foreground">
+            Technologies I work with daily
+          </p>
         </div>
 
-        <div ref={gridRef} className="relative grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div
+          ref={gridRef}
+          className="relative grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4"
+        >
           {skills.map((skill, index) => (
             <div
               key={skill.name}
@@ -134,19 +156,20 @@ export default function SkillsSection() {
                   transition: "transform 0.3s ease",
                 }}
                 onMouseMove={(e) => {
-                  const card = e.currentTarget
-                  const rect = card.getBoundingClientRect()
-                  const x = e.clientX - rect.left
-                  const y = e.clientY - rect.top
-                  const centerX = rect.width / 2
-                  const centerY = rect.height / 2
-                  const rotateX = (y - centerY) / 10
-                  const rotateY = (centerX - x) / 10
+                  const card = e.currentTarget;
+                  const rect = card.getBoundingClientRect();
+                  const x = e.clientX - rect.left;
+                  const y = e.clientY - rect.top;
+                  const centerX = rect.width / 2;
+                  const centerY = rect.height / 2;
+                  const rotateX = (y - centerY) / 10;
+                  const rotateY = (centerX - x) / 10;
 
-                  card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`
+                  card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "perspective(1000px) rotateX(0) rotateY(0) translateZ(0)"
+                  e.currentTarget.style.transform =
+                    "perspective(1000px) rotateX(0) rotateY(0) translateZ(0)";
                 }}
               >
                 {/* Shine effect */}
@@ -160,6 +183,11 @@ export default function SkillsSection() {
                     src={skill.logo || "/placeholder.svg"}
                     alt={skill.name}
                     className="relative z-10 h-14 w-14 object-contain drop-shadow-2xl"
+                    onError={(e) => {
+                      const img = e.currentTarget as HTMLImageElement;
+                      if (!img.src.includes("/placeholder.svg"))
+                        img.src = "/placeholder.svg";
+                    }}
                   />
                 </div>
 
@@ -184,7 +212,9 @@ export default function SkillsSection() {
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
-                animation: `float ${5 + Math.random() * 10}s ease-in-out infinite`,
+                animation: `float ${
+                  5 + Math.random() * 10
+                }s ease-in-out infinite`,
                 animationDelay: `${Math.random() * 5}s`,
               }}
             />
@@ -196,5 +226,5 @@ export default function SkillsSection() {
       <div className="pointer-events-none absolute left-20 top-20 h-96 w-96 rounded-full bg-white/10 blur-[120px]" />
       <div className="pointer-events-none absolute bottom-20 right-20 h-96 w-96 rounded-full bg-white/5 blur-[120px]" />
     </section>
-  )
+  );
 }

@@ -6,17 +6,29 @@ import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+type ChatMessage = {
+  role: "assistant" | "user";
+  content: string;
+  ts: number;
+};
+
+const formatTime = (ts: number) =>
+  new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
 export default function ChatSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
       content:
         "Hi! I'm Tejas. Feel free to ask me anything about my work, skills, or let's just chat!",
+      ts: Date.now(),
     },
   ]);
   const [isTyping, setIsTyping] = useState(false);
@@ -59,7 +71,10 @@ export default function ChatSection() {
     const userMsg = message;
 
     // Add user message
-    setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: userMsg, ts: Date.now() },
+    ]);
     setMessage("");
     setIsTyping(true);
 
@@ -81,6 +96,7 @@ export default function ChatSection() {
             content: errText.includes("Index not built")
               ? "The AI index isn't built yet. Please initialize it by calling POST /api/agent/build with your resume file paths or text."
               : `Sorry, I ran into an issue: ${errText}`,
+            ts: Date.now(),
           },
         ]);
         return;
@@ -93,6 +109,7 @@ export default function ChatSection() {
         {
           role: "assistant",
           content: data.answer || "I couldn't generate an answer.",
+          ts: Date.now(),
         },
       ]);
     } catch (error: any) {
@@ -102,6 +119,7 @@ export default function ChatSection() {
         {
           role: "assistant",
           content: `Network error: ${error?.message || "unknown"}`,
+          ts: Date.now(),
         },
       ]);
     }
@@ -151,24 +169,27 @@ export default function ChatSection() {
                       : "rounded-tr-none bg-primary text-primary-foreground"
                   }`}
                 >
-                  <p
-                    className={`text-sm leading-relaxed ${
-                      msg.role === "assistant" ? "text-foreground" : ""
-                    }`}
-                  >
-                    {msg.content}
-                  </p>
+                  {msg.role === "assistant" ? (
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      className="prose prose-invert prose-p:m-0 prose-pre:bg-black/30 prose-code:px-1 prose-code:py-0.5 prose-code:bg-black/20 prose-code:rounded"
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  ) : (
+                    <p className="text-sm leading-relaxed">{msg.content}</p>
+                  )}
 
                   {/* Timestamp */}
-                  <p
+                  <span
                     className={`mt-2 text-xs ${
                       msg.role === "assistant"
                         ? "text-muted-foreground"
                         : "opacity-70"
                     }`}
                   >
-                    Just now
-                  </p>
+                    {formatTime(msg.ts)}
+                  </span>
 
                   {/* Glow effect */}
                   <div

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
 import { getChunks, hasChunks, setChunks } from "@/lib/agent/state";
 import { loadChunksFromDisk, saveChunksToDisk } from "@/lib/agent/storage";
 import { embedTexts, cosineSimilarity } from "@/lib/agent/embeddings";
@@ -80,28 +79,50 @@ export async function POST(req: NextRequest) {
       .map((r, i) => `[[Chunk ${i + 1}]]\n${r.text}`)
       .join("\n\n");
 
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const apiKey = process.env.MISTRAL_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "Missing MISTRAL_API_KEY in environment" },
+        { status: 500 }
+      );
+    }
 
     const prompt = `You are a helpful assistant answering questions about a resume/profile.
-Use only the provided context. If the answer isn't in the context, say you don't know. Respond in FPP.
+Use only the provided context. If the answer isn't in the context, say you don't know. Respond in FPP as if you are the person answering the question. Do not include any words which sound like a text that an LLM has sent while answering the question. Don't get into too much detail. Answer in max 3-4 sentences. Answer straight to the point.
 
 Question: ${question}
 \nContext:\n${context}`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "You are a concise and accurate assistant.",
+    const mistralRes = await fetch(
+      "https://api.mistral.ai/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
         },
-        { role: "user", content: prompt },
-      ],
-      temperature: 0.5,
-    });
+        body: JSON.stringify({
+          model: process.env.MISTRAL_CHAT_MODEL || "mistral-small-latest",
+          messages: [
+            {
+              role: "system",
+              content: "You are a concise and accurate assistant.",
+            },
+            { role: "user", content: prompt },
+          ],
+          temperature: 0.5,
+        }),
+      }
+    );
 
+    if (!mistralRes.ok) {
+      const errText = await mistralRes.text();
+      throw new Error(`Mistral API error ${mistralRes.status}: ${errText}`);
+    }
+
+    const completion: any = await mistralRes.json();
     const answer =
-      completion.choices[0]?.message?.content ||
+      completion?.choices?.[0]?.message?.content ||
       "I couldn't generate an answer.";
 
     return NextResponse.json({ answer });
