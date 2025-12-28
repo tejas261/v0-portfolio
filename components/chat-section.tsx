@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useEffect, useRef, useState } from "react";
-import { Send, Sparkles } from "lucide-react";
+import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -110,30 +110,21 @@ export default function ChatSection() {
   return (
     <section
       ref={sectionRef}
-      className="section relative flex items-center justify-center bg-linear-to-b from-background to-secondary/30 px-6 py-20"
+      className="section relative min-h-screen bg-linear-to-b from-background to-secondary/30 px-6 py-20"
     >
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-7xl mx-auto">
         <div className="mb-8 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border/50 bg-card/50 px-4 py-2 backdrop-blur-sm">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-muted-foreground">
-              AI-Powered Chat Coming Soon
-            </span>
-          </div>
-          <h2 className="font-sans text-5xl font-black text-foreground md:text-6xl">
-            {"Let's Connect"}
+          <h2 className="font-sans text-5xl font-black tracking-tight text-foreground md:text-6xl">
+            Let's Connect
           </h2>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Ask me anything about my work, experience, or skills.
+          </p>
         </div>
 
-        <div
-          ref={chatRef}
-          className="relative overflow-hidden rounded-3xl border border-border/50 bg-linear-to-br from-card/80 via-card/60 to-card/80 shadow-2xl backdrop-blur-2xl"
-        >
-          {/* linear overlay */}
-          <div className="absolute inset-0 bg-linear-to-br from-white/5 via-white/3 to-white/5" />
-
+        <div ref={chatRef} className="relative">
           {/* Messages area */}
-          <div className="relative z-10 h-125 space-y-6 overflow-y-auto p-8 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border">
+          <div className="relative z-10 h-[60vh] md:h-[65vh] space-y-6 overflow-y-auto p-4 sm:p-6 messages">
             {messages.map((msg, index) => (
               <div
                 key={index}
@@ -154,10 +145,10 @@ export default function ChatSection() {
 
                 {/* Message bubble */}
                 <div
-                  className={`group relative max-w-[70%] rounded-2xl px-6 py-4 shadow-lg transition-all hover:scale-[1.02] ${
+                  className={`group relative max-w-[70%] rounded-2xl px-6 py-4 shadow-lg transition-all hover:scale-[1.01] ${
                     msg.role === "assistant"
-                      ? "rounded-tl-none bg-card/90 backdrop-blur-xl"
-                      : "rounded-tr-none bg-foreground text-background"
+                      ? "rounded-tl-none bg-white/10 text-foreground backdrop-blur-md ring-1 ring-white/10"
+                      : "rounded-tr-none bg-primary text-primary-foreground"
                   }`}
                 >
                   <p
@@ -210,19 +201,19 @@ export default function ChatSection() {
 
           <form
             onSubmit={handleSubmit}
-            className="relative z-10 border-t border-border/50 bg-card/50 p-6 backdrop-blur-xl"
+            className="sticky bottom-0 z-10 mt-2 bg-background/60 px-2 py-4 backdrop-blur"
           >
-            <div className="flex items-center gap-3">
+            <div className="relative">
               <Input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 rounded-full border-border/50 bg-background/50 px-6 py-6 text-base backdrop-blur-sm transition-all focus:border-primary focus:shadow-lg focus:shadow-primary/20"
+                className="w-full rounded-full border-border/50 bg-background/70 px-6 py-6 pr-14 text-base backdrop-blur-sm transition-all focus:border-primary focus:ring-2 focus:ring-primary/30"
               />
               <Button
                 type="submit"
                 size="icon"
-                className="h-12 w-12 shrink-0 rounded-full bg-white text-black shadow-lg transition-all hover:scale-110 hover:shadow-xl hover:shadow-white/50"
+                className="absolute right-1.5 top-1/2 h-11 w-11 -translate-y-1/2 rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
               >
                 <Send className="h-5 w-5" />
               </Button>
@@ -242,6 +233,13 @@ export default function ChatSection() {
       <div className="pointer-events-none absolute left-1/4 top-20 h-96 w-96 rounded-full bg-white/10 blur-[120px]" />
       <div className="pointer-events-none absolute bottom-20 right-1/4 h-96 w-96 rounded-full bg-white/5 blur-[120px]" />
       <style jsx>{`
+        .messages {
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
+        }
+        .messages::-webkit-scrollbar {
+          display: none; /* Chrome, Safari, Opera */
+        }
         .typing {
           display: flex;
           gap: 6px;
