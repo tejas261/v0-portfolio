@@ -1,33 +1,33 @@
-"use client"
+"use client";
 
-import { useEffect, useRef } from "react"
-import { Github, Linkedin, Mail, Phone } from "lucide-react"
-import { Raleway } from "next/font/google"
+import { useEffect, useRef } from "react";
+import { Github, Linkedin, Mail, Phone } from "lucide-react";
+import { Raleway } from "next/font/google";
 
-const raleway = Raleway({ subsets: ["latin"] })
+const raleway = Raleway({ subsets: ["latin"] });
 
 declare global {
   interface Window {
-    gsap: any
-    ScrollTrigger: any
-    TextPlugin: any
+    gsap: any;
+    ScrollTrigger: any;
+    TextPlugin: any;
   }
 }
 
 export default function HeroSection() {
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const line1Ref = useRef<HTMLParagraphElement>(null)
-  const line2Ref = useRef<HTMLParagraphElement>(null)
-  const line3Ref = useRef<HTMLParagraphElement>(null)
-  const nameRef = useRef<HTMLHeadingElement>(null)
-  const linksRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const line1Ref = useRef<HTMLParagraphElement>(null);
+  const line2Ref = useRef<HTMLParagraphElement>(null);
+  const line3Ref = useRef<HTMLParagraphElement>(null);
+  const nameRef = useRef<HTMLHeadingElement>(null);
+  const linksRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const checkGSAP = setInterval(() => {
       if (window.gsap && window.ScrollTrigger && window.TextPlugin) {
-        clearInterval(checkGSAP)
-        const gsap = window.gsap
-        gsap.registerPlugin(window.ScrollTrigger, window.TextPlugin)
+        clearInterval(checkGSAP);
+        const gsap = window.gsap;
+        gsap.registerPlugin(window.ScrollTrigger, window.TextPlugin);
 
         gsap.fromTo(
           nameRef.current,
@@ -38,10 +38,10 @@ export default function HeroSection() {
             scale: 1,
             duration: 1.2,
             ease: "power3.out",
-          },
-        )
+          }
+        );
 
-        const tl = gsap.timeline()
+        const tl = gsap.timeline();
 
         tl.to(line1Ref.current, {
           duration: 1.5,
@@ -60,7 +60,7 @@ export default function HeroSection() {
             text: "and modern web technologies.",
             ease: "none",
             delay: 0.3,
-          })
+          });
 
         gsap.fromTo(
           linksRef.current?.children || [],
@@ -73,8 +73,8 @@ export default function HeroSection() {
             stagger: 0.15,
             delay: 4,
             ease: "back.out(1.7)",
-          },
-        )
+          }
+        );
 
         gsap.to(sectionRef.current, {
           scrollTrigger: {
@@ -86,25 +86,19 @@ export default function HeroSection() {
           y: 200,
           scale: 1.05,
           opacity: 0.5,
-        })
+        });
       }
-    }, 100)
+    }, 100);
 
-    return () => clearInterval(checkGSAP)
-  }, [])
+    return () => clearInterval(checkGSAP);
+  }, []);
 
   return (
     <section
       ref={sectionRef}
-      className="section relative flex items-center overflow-hidden"
-      style={{
-        backgroundImage:
-          "url(/placeholder.svg?height=1080&width=1920&query=professional+male+developer+portrait+cinematic+dark+moody+lighting)",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
+      className="section hero-section relative flex items-center overflow-hidden"
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-r from-background/95 via-background/70 to-transparent" />
 
       <div className="absolute inset-0 bg-background/40" />
 
@@ -113,7 +107,8 @@ export default function HeroSection() {
           ref={nameRef}
           className="mb-8 font-sans text-7xl font-black tracking-tighter text-foreground drop-shadow-2xl md:text-9xl"
           style={{
-            textShadow: "0 0 40px rgba(101, 100, 255, 0.5), 0 0 80px rgba(101, 100, 255, 0.3)",
+            textShadow:
+              "0 0 40px rgba(101, 100, 255, 0.5), 0 0 80px rgba(101, 100, 255, 0.3)",
           }}
         >
           TEJAS M
@@ -123,14 +118,14 @@ export default function HeroSection() {
           className="mb-12 space-y-2 text-lg leading-relaxed text-foreground md:text-xl"
           style={{ fontFamily: raleway.style.fontFamily }}
         >
-          <p ref={line1Ref} className="min-h-[28px]" />
-          <p ref={line2Ref} className="min-h-[28px]" />
-          <p ref={line3Ref} className="min-h-[28px]" />
+          <p ref={line1Ref} className="min-h-7" />
+          <p ref={line2Ref} className="min-h-7" />
+          <p ref={line3Ref} className="min-h-7" />
         </div>
 
         <div ref={linksRef} className="flex flex-wrap items-center gap-4">
           <a
-            href="https://github.com/tejasm"
+            href="https://github.com/tejas261"
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-2 rounded-xl border border-primary/30 bg-card/40 px-5 py-3 backdrop-blur-sm transition-all hover:scale-105 hover:border-primary hover:bg-primary/20 hover:shadow-lg hover:shadow-primary/30"
@@ -139,7 +134,7 @@ export default function HeroSection() {
             <span className="font-medium">GitHub</span>
           </a>
           <a
-            href="https://linkedin.com/in/tejasm"
+            href="https://linkedin.com/in/tejas26"
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-2 rounded-xl border border-primary/30 bg-card/40 px-5 py-3 backdrop-blur-sm transition-all hover:scale-105 hover:border-primary hover:bg-primary/20 hover:shadow-lg hover:shadow-primary/30"
@@ -156,7 +151,7 @@ export default function HeroSection() {
           </a>
           <a
             href="tel:+917411545570"
-            className="group flex items-center gap-2 rounded-xl border border-primary/30 bg-card/40 px-5 py-3 backdrop-blur-sm transition-all hover:scale-105 hover:border-primary hover:bg-primary/20 hover:shadow-lg hover:shadow-primary/30"
+            className="group sm:flex md:hidden flex items-center gap-2 rounded-xl border border-primary/30 bg-card/40 px-5 py-3 backdrop-blur-sm transition-all hover:scale-105 hover:border-primary hover:bg-primary/20 hover:shadow-lg hover:shadow-primary/30"
           >
             <Phone className="h-5 w-5 transition-transform group-hover:rotate-12" />
             <span className="font-medium">Call</span>
@@ -166,6 +161,21 @@ export default function HeroSection() {
 
       <div className="pointer-events-none absolute -right-20 top-20 h-96 w-96 rounded-full bg-primary/20 blur-[100px]" />
       <div className="pointer-events-none absolute -bottom-20 right-40 h-96 w-96 rounded-full bg-accent/20 blur-[100px]" />
+
+      <style jsx>{`
+        .hero-section {
+          background-image: url("/hero-bg.png?height=1080&width=1920&query=professional+male+developer+portrait+cinematic+dark+moody+lighting");
+          background-size: cover;
+          background-position: center;
+        }
+        @media (max-width: 1024px) {
+          .hero-section {
+            background-image: url("/hero-mobile.png");
+            background-size: cover;
+            background-position: center;
+          }
+        }
+      `}</style>
     </section>
-  )
+  );
 }

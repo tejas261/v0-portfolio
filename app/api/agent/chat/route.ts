@@ -1,0 +1,115 @@
+import { NextRequest, NextResponse } from "next/server";
+import OpenAI from "openai";
+import { getChunks, hasChunks, setChunks } from "@/lib/agent/state";
+import { loadChunksFromDisk, saveChunksToDisk } from "@/lib/agent/storage";
+import { embedTexts, cosineSimilarity } from "@/lib/agent/embeddings";
+
+export const runtime = "nodejs";
+
+function scoreChunkKeyword(question: string, chunk: string): number {
+  const qTokens = new Set(
+    question
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter(Boolean)
+  );
+  const cTokens = chunk
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+  let score = 0;
+  for (const t of cTokens) if (qTokens.has(t)) score += 1;
+  return score + Math.min(chunk.length / 1000, 1);
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const { question } = (await req.json()) as { question?: string };
+    if (!question || !question.trim()) {
+      return NextResponse.json({ error: "Missing question" }, { status: 400 });
+    }
+
+    if (!hasChunks()) {
+      const disk = await loadChunksFromDisk();
+      if (disk && disk.length) {
+        setChunks(disk);
+      }
+    }
+
+    if (!hasChunks()) {
+      return NextResponse.json(
+        {
+          error:
+            "Index not built. POST /api/agent/build first with { paths: string[] } or { text: string }.",
+        },
+        { status: 400 }
+      );
+    }
+
+    let chunks = getChunks();
+
+    // If embeddings are missing (e.g., old index), upgrade in place
+    if (!chunks.some((c) => Array.isArray(c.embedding))) {
+      const embs = await embedTexts(chunks.map((c) => c.text));
+      chunks = chunks.map((c, i) => ({ ...c, embedding: embs[i] }));
+      setChunks(chunks);
+      await saveChunksToDisk(chunks); // persist upgraded index
+    }
+
+    let ranked: { text: string; s: number }[];
+    const firstWithEmb = chunks.find((c) => Array.isArray(c.embedding));
+    if (firstWithEmb && firstWithEmb.embedding) {
+      const [qVec] = await embedTexts([question]);
+      ranked = chunks
+        .map((c) => ({
+          text: c.text,
+          s: c.embedding ? cosineSimilarity(qVec, c.embedding) : 0,
+        }))
+        .sort((a, b) => b.s - a.s)
+        .slice(0, 8);
+    } else {
+      ranked = chunks
+        .map((c) => ({ text: c.text, s: scoreChunkKeyword(question, c.text) }))
+        .sort((a, b) => b.s - a.s)
+        .slice(0, 8);
+    }
+
+    const context = ranked
+      .map((r, i) => `[[Chunk ${i + 1}]]\n${r.text}`)
+      .join("\n\n");
+
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const prompt = `You are a helpful assistant answering questions about a resume/profile.
+Use only the provided context. If the answer isn't in the context, say you don't know. Respond in FPP.
+
+Question: ${question}
+\nContext:\n${context}`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a concise and accurate assistant.",
+        },
+        { role: "user", content: prompt },
+      ],
+      temperature: 0.5,
+    });
+
+    const answer =
+      completion.choices[0]?.message?.content ||
+      "I couldn't generate an answer.";
+
+    return NextResponse.json({ answer });
+  } catch (err: any) {
+    console.error("/api/agent/chat error", err);
+    return NextResponse.json(
+      { error: err?.message || "Failed to answer" },
+      { status: 500 }
+    );
+  }
+}

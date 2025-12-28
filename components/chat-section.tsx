@@ -1,29 +1,31 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEffect, useRef, useState } from "react"
-import { Send, Sparkles } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { useEffect, useRef, useState } from "react";
+import { Send, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function ChatSection() {
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const chatRef = useRef<HTMLDivElement>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const [message, setMessage] = useState("")
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content: "Hi! I'm Tejas. Feel free to ask me anything about my work, skills, or let's just chat!",
+      content:
+        "Hi! I'm Tejas. Feel free to ask me anything about my work, skills, or let's just chat!",
     },
-  ])
+  ]);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     const checkGSAP = setInterval(() => {
       if (window.gsap && window.ScrollTrigger) {
-        clearInterval(checkGSAP)
-        const gsap = window.gsap
+        clearInterval(checkGSAP);
+        const gsap = window.gsap;
 
         gsap.fromTo(
           chatRef.current,
@@ -38,67 +40,113 @@ export default function ChatSection() {
               trigger: chatRef.current,
               start: "top 80%",
             },
-          },
-        )
+          }
+        );
       }
-    }, 100)
+    }, 100);
 
-    return () => clearInterval(checkGSAP)
-  }, [])
+    return () => clearInterval(checkGSAP);
+  }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!message.trim()) return
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+
+    const userMsg = message;
 
     // Add user message
-    setMessages((prev) => [...prev, { role: "user", content: message }])
-    setMessage("")
+    setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
+    setMessage("");
+    setIsTyping(true);
 
-    // Simulate response (backend integration later)
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/agent/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: userMsg }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const errText = data?.error || `Error ${res.status}`;
+        setIsTyping(false);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: errText.includes("Index not built")
+              ? "The AI index isn't built yet. Please initialize it by calling POST /api/agent/build with your resume file paths or text."
+              : `Sorry, I ran into an issue: ${errText}`,
+          },
+        ]);
+        return;
+      }
+
+      const data = (await res.json()) as { answer?: string };
+      setIsTyping(false);
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "Thanks for your message! I'll get back to you soon.",
+          content: data.answer || "I couldn't generate an answer.",
         },
-      ])
-    }, 1000)
-  }
+      ]);
+    } catch (error: any) {
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: `Network error: ${error?.message || "unknown"}`,
+        },
+      ]);
+    }
+  };
 
   return (
     <section
       ref={sectionRef}
-      className="section relative flex items-center justify-center bg-gradient-to-b from-background to-secondary/30 px-6 py-20"
+      className="section relative flex items-center justify-center bg-linear-to-b from-background to-secondary/30 px-6 py-20"
     >
       <div className="w-full max-w-4xl">
         <div className="mb-8 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border/50 bg-card/50 px-4 py-2 backdrop-blur-sm">
             <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-muted-foreground">AI-Powered Chat Coming Soon</span>
+            <span className="text-sm font-medium text-muted-foreground">
+              AI-Powered Chat Coming Soon
+            </span>
           </div>
-          <h2 className="font-sans text-5xl font-black text-foreground md:text-6xl">{"Let's Connect"}</h2>
+          <h2 className="font-sans text-5xl font-black text-foreground md:text-6xl">
+            {"Let's Connect"}
+          </h2>
         </div>
 
         <div
           ref={chatRef}
-          className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-card/80 via-card/60 to-card/80 shadow-2xl backdrop-blur-2xl"
+          className="relative overflow-hidden rounded-3xl border border-border/50 bg-linear-to-br from-card/80 via-card/60 to-card/80 shadow-2xl backdrop-blur-2xl"
         >
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-white/3 to-white/5" />
+          {/* linear overlay */}
+          <div className="absolute inset-0 bg-linear-to-br from-white/5 via-white/3 to-white/5" />
 
           {/* Messages area */}
-          <div className="relative z-10 h-[500px] space-y-6 overflow-y-auto p-8 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border">
+          <div className="relative z-10 h-125 space-y-6 overflow-y-auto p-8 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border">
             {messages.map((msg, index) => (
-              <div key={index} className={`flex items-start gap-4 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
+              <div
+                key={index}
+                className={`flex items-start gap-4 ${
+                  msg.role === "user" ? "flex-row-reverse" : ""
+                }`}
+              >
                 {/* Avatar */}
                 <div
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold shadow-lg ${
-                    msg.role === "assistant" ? "bg-white text-black" : "bg-foreground text-background"
+                    msg.role === "assistant"
+                      ? "bg-white text-black"
+                      : "bg-foreground text-background"
                   }`}
                 >
                   {msg.role === "assistant" ? "T" : "U"}
@@ -112,12 +160,22 @@ export default function ChatSection() {
                       : "rounded-tr-none bg-foreground text-background"
                   }`}
                 >
-                  <p className={`text-sm leading-relaxed ${msg.role === "assistant" ? "text-foreground" : ""}`}>
+                  <p
+                    className={`text-sm leading-relaxed ${
+                      msg.role === "assistant" ? "text-foreground" : ""
+                    }`}
+                  >
                     {msg.content}
                   </p>
 
                   {/* Timestamp */}
-                  <p className={`mt-2 text-xs ${msg.role === "assistant" ? "text-muted-foreground" : "opacity-70"}`}>
+                  <p
+                    className={`mt-2 text-xs ${
+                      msg.role === "assistant"
+                        ? "text-muted-foreground"
+                        : "opacity-70"
+                    }`}
+                  >
                     Just now
                   </p>
 
@@ -130,6 +188,23 @@ export default function ChatSection() {
                 </div>
               </div>
             ))}
+
+            {isTyping && (
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold shadow-lg bg-white text-black">
+                  T
+                </div>
+                <div className="group relative max-w-[70%] rounded-2xl px-6 py-4 shadow-lg transition-all rounded-tl-none bg-card/90 backdrop-blur-xl">
+                  <div className="typing text-foreground">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                  <div className="absolute -inset-1 -z-10 rounded-2xl opacity-0 blur-xl transition-opacity group-hover:opacity-100 bg-white/20" />
+                </div>
+              </div>
+            )}
+
             <div ref={messagesEndRef} />
           </div>
 
@@ -157,13 +232,49 @@ export default function ChatSection() {
 
         {/* Footer */}
         <div className="mt-8 text-center">
-          <p className="text-sm text-muted-foreground">© 2025 Tejas M • Built with Next.js, TypeScript & GSAP</p>
+          <p className="text-sm text-muted-foreground">
+            © {new Date().getFullYear()} Tejas M • Bengaluru
+          </p>
         </div>
       </div>
 
       {/* Ambient glow effects */}
       <div className="pointer-events-none absolute left-1/4 top-20 h-96 w-96 rounded-full bg-white/10 blur-[120px]" />
       <div className="pointer-events-none absolute bottom-20 right-1/4 h-96 w-96 rounded-full bg-white/5 blur-[120px]" />
+      <style jsx>{`
+        .typing {
+          display: flex;
+          gap: 6px;
+          align-items: center;
+        }
+        .typing span {
+          width: 8px;
+          height: 8px;
+          border-radius: 9999px;
+          background: currentColor;
+          opacity: 0.3;
+          display: inline-block;
+          animation: typing-blink 1.4s infinite ease-in-out;
+        }
+        .typing span:nth-child(2) {
+          animation-delay: 0.2s;
+        }
+        .typing span:nth-child(3) {
+          animation-delay: 0.4s;
+        }
+        @keyframes typing-blink {
+          0%,
+          80%,
+          100% {
+            opacity: 0.3;
+            transform: translateY(0);
+          }
+          40% {
+            opacity: 1;
+            transform: translateY(-3px);
+          }
+        }
+      `}</style>
     </section>
-  )
+  );
 }
