@@ -180,7 +180,7 @@ export default function JourneySection() {
                       </div>
 
                       {/* Step indicator */}
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 mt-4">
                         {journeySteps.map((_, i) => (
                           <div
                             key={i}
