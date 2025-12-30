@@ -3,6 +3,7 @@
 ## Biodata
 
 - Name: Tejas M
+- Gender: Male
 - Location: Bengaluru, India
 - Current Role: Graduate Software Development Engineer at Fynd, building ratl.ai
 - School : The New Cambridge High School, Bengaluru
@@ -14,9 +15,9 @@
 
 ## Interests & Hobbies
 
-- Long-distance running and weekend hikes in local trails
-- Reading sci-fi and behavioral economics
-- Fitness and calistenics
+- Night-outs, weekend hikes in local trails
+- Exploring and learning about astrophysics and outer space, Time travel theories
+- Photography, Fitness and calistenics
 - Stock market investing and personal finance
 
 ## Free Time
@@ -24,7 +25,7 @@
 - Weeknights: Software side projects, experimenting new domains in tech
 - Late nights: Listening to podcasts on psychology and productivity
 - Weekdays: Focused on work and building ratl.ai
-- Weekends: Park runs, coffee with friends, experimenting with home cooking, Indulge in sports like cricket, volleyball and badminton
+- Weekends: Indulge in sports like cricket, volleyball and badminton, coffee with friends, experimenting with home cooking
 
 # About ratl.ai
 

@@ -16,6 +16,10 @@ const skills = [
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
   },
   {
+    name: "Generative & Agentic AI",
+    logo: "/openai.svg",
+  },
+  {
     name: "Node.js",
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
   },
@@ -46,10 +50,6 @@ const skills = [
   {
     name: "AWS",
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg",
-  },
-  {
-    name: "Generative & Agentic AI",
-    logo: "/openai.svg",
   },
 ];
 
@@ -121,7 +121,7 @@ export default function SkillsSection() {
   return (
     <section
       ref={sectionRef}
-      className="section relative flex items-center justify-center overflow-hidden bg-gradient-to-b from-background via-secondary/20 to-background px-6 py-20"
+      className="section relative flex items-center justify-center overflow-hidden bg-linear-to-b from-background via-secondary/20 to-background px-6 py-20"
     >
       <div className="relative w-full max-w-7xl">
         <div className="mb-16 text-center">
@@ -173,7 +173,7 @@ export default function SkillsSection() {
                 }}
               >
                 {/* Shine effect */}
-                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/0 via-white/5 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-linear-to-br from-white/0 via-white/5 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                 {/* Logo */}
                 <div className="relative z-10 flex h-16 w-16 items-center justify-center transition-transform duration-300 group-hover:scale-110">

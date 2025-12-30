@@ -30,6 +30,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing question" }, { status: 400 });
     }
 
+    const q = question.toLowerCase();
+    if (/\b(resume|cv)\b/.test(q) || /\b(link|download|pdf)\b/.test(q)) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return NextResponse.json({
+        answer: "Here you go — [Download my resume](/resume.pdf).",
+      });
+    }
+
     if (!hasChunks()) {
       const disk = await loadChunksFromDisk();
       if (disk && disk.length) {

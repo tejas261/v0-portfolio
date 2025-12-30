@@ -172,6 +172,11 @@ export default function ChatSection() {
                   {msg.role === "assistant" ? (
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
+                      components={{
+                        a: (props: React.ComponentProps<"a">) => (
+                          <a {...props} download />
+                        ),
+                      }}
                       className="prose prose-invert prose-p:m-0 prose-pre:bg-black/30 prose-code:px-1 prose-code:py-0.5 prose-code:bg-black/20 prose-code:rounded"
                     >
                       {msg.content}

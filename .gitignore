@@ -21,9 +21,11 @@ yarn-error.log*
 
 # vercel
 .vercel
+.vscode
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 .agent
 package-lock.json
+.DS_Store

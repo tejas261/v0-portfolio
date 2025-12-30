@@ -6,7 +6,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
- 
-}
+  output: "standalone",
+  experimental: {
+    webpackMemoryOptimizations: true,
+  },
+};
 
-export default nextConfig
+export default nextConfig;
