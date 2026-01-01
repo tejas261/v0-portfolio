@@ -1,9 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getChunks, hasChunks, setChunks } from "@/lib/agent/state";
 import { loadChunksFromDisk, saveChunksToDisk } from "@/lib/agent/storage";
-import { embedTexts, cosineSimilarity } from "@/lib/agent/embeddings";
+import { cosineSimilarity } from "@/lib/agent/embeddings";
 
 export const runtime = "nodejs";
+
+// Use Mistral embeddings to avoid requiring OPENAI_API_KEY
+async function embedWithMistral(texts: string[]): Promise<number[][]> {
+  const apiKey = process.env.MISTRAL_API_KEY;
+  if (!apiKey) {
+    throw new Error("Missing MISTRAL_API_KEY in environment");
+  }
+  const model = process.env.MISTRAL_EMBED_MODEL || "mistral-embed";
+  const res = await fetch("https://api.mistral.ai/v1/embeddings", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({ model, input: texts }),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Mistral Embeddings API error ${res.status}: ${errText}`);
+  }
+  const json: any = await res.json();
+  const vectors = json?.data?.map((d: any) => d.embedding);
+  if (!Array.isArray(vectors) || vectors.length !== texts.length) {
+    throw new Error("Invalid embeddings response from Mistral");
+  }
+  return vectors as number[][];
+}
 
 function scoreChunkKeyword(question: string, chunk: string): number {
   const qTokens = new Set(
@@ -59,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     // If embeddings are missing (e.g., old index), upgrade in place
     if (!chunks.some((c) => Array.isArray(c.embedding))) {
-      const embs = await embedTexts(chunks.map((c) => c.text));
+      const embs = await embedWithMistral(chunks.map((c) => c.text));
       chunks = chunks.map((c, i) => ({ ...c, embedding: embs[i] }));
       setChunks(chunks);
       await saveChunksToDisk(chunks); // persist upgraded index
@@ -68,7 +95,7 @@ export async function POST(req: NextRequest) {
     let ranked: { text: string; s: number }[];
     const firstWithEmb = chunks.find((c) => Array.isArray(c.embedding));
     if (firstWithEmb && firstWithEmb.embedding) {
-      const [qVec] = await embedTexts([question]);
+      const [qVec] = await embedWithMistral([question]);
       ranked = chunks
         .map((c) => ({
           text: c.text,

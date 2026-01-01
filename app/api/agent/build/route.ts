@@ -4,9 +4,35 @@ import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { setChunks, type Chunk } from "@/lib/agent/state";
 import { readTextFromPath } from "@/lib/agent/text";
 import { saveChunksToDisk, getIndexPath } from "@/lib/agent/storage";
-import { embedTexts } from "@/lib/agent/embeddings";
 
 export const runtime = "nodejs";
+
+// Use Mistral embeddings to avoid requiring OPENAI_API_KEY
+async function embedWithMistral(texts: string[]): Promise<number[][]> {
+  const apiKey = process.env.MISTRAL_API_KEY;
+  if (!apiKey) {
+    throw new Error("Missing MISTRAL_API_KEY in environment");
+  }
+  const model = process.env.MISTRAL_EMBED_MODEL || "mistral-embed";
+  const res = await fetch("https://api.mistral.ai/v1/embeddings", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({ model, input: texts }),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Mistral Embeddings API error ${res.status}: ${errText}`);
+  }
+  const json: any = await res.json();
+  const vectors = json?.data?.map((d: any) => d.embedding);
+  if (!Array.isArray(vectors) || vectors.length !== texts.length) {
+    throw new Error("Invalid embeddings response from Mistral");
+  }
+  return vectors as number[][];
+}
 
 type BuildBody =
   | { paths: string[] }
@@ -63,8 +89,8 @@ export async function POST(req: NextRequest) {
       text: d.pageContent,
     }));
 
-    // Compute OpenAI embeddings for all chunks
-    const embeddings = await embedTexts(baseChunks.map((c) => c.text));
+    // Compute Mistral embeddings for all chunks
+    const embeddings = await embedWithMistral(baseChunks.map((c) => c.text));
     const chunks: Chunk[] = baseChunks.map((c, i) => ({
       ...c,
       embedding: embeddings[i],
@@ -77,8 +103,7 @@ export async function POST(req: NextRequest) {
       ok: true,
       chunks: chunks.length,
       storedAt: getIndexPath(),
-      embeddingModel:
-        process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small",
+      embeddingModel: process.env.MISTRAL_EMBED_MODEL || "mistral-embed",
     });
   } catch (err: any) {
     console.error("/api/agent/build error", err);
