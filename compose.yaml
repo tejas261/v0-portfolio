@@ -1,5 +1,8 @@
+version: "3.8"
 services:
   my-portfolio:
+    # Explicitly specifies the target architecture for the build AND runtime
+    platform: linux/amd64
     container_name: my-portfolio
     build:
       context: .

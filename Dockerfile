@@ -2,9 +2,6 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 
-# Increase Node.js heap available to the build (adjust as needed)
-ENV NODE_OPTIONS="--max-old-space-size=4096"
-
 COPY package*.json ./
 RUN npm ci --no-audit --no-fund
 

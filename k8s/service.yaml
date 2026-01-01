@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: portfolio
+spec:
+  selector:
+    app: portfolio
+  ports:
+    - port: 80
+      targetPort: 3000
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: portfolio-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "tejas.great-site.net"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: portfolio
+                port:
+                  number: 80
