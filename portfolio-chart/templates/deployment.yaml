@@ -13,6 +13,6 @@ spec:
     spec:
       containers:
         - name: portfolio
-          image: docker.io/tejas261/portfolio
+          image: docker.io/tejas261/portfolio:amd64
           ports:
             - containerPort: 3000

@@ -6,6 +6,9 @@ COPY package*.json ./
 RUN npm ci --no-audit --no-fund
 
 COPY . .
+
+ENV NODE_OPTIONS="--max-old-space-size=3584"
+
 RUN npm run build
 
 # Stage 2: Runner
