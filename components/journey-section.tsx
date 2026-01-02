@@ -15,7 +15,7 @@ const journeySteps = [
   // },
   {
     title: "Graduation",
-    place: "VTU - CSE",
+    place: "VTU - Computer Science & Engineering",
     detail: "CGPA: 8.3",
     year: "2020-2024",
     emoji: "🎓",
@@ -153,7 +153,7 @@ export default function JourneySection() {
                       {step.emoji}
                     </div>
 
-                    <div className="relative z-10 flex h-full w-full flex-col justify-between p-10 sm:max-w-40 md:max-w-125">
+                    <div className="relative z-10 flex h-full w-full flex-col justify-between p-6 md:p-10 sm:max-w-40 md:max-w-125">
                       {/* Year badge */}
                       <div className="inline-flex self-start">
                         <span
@@ -164,7 +164,7 @@ export default function JourneySection() {
                       </div>
 
                       {/* Content */}
-                      <div className="space-y-4">
+                      <div className="space-y-4 sm:max-w-40 md:max-w-125 w-full">
                         <div className="text-7xl mt-4">{step.emoji}</div>
                         <div className="flex flex-col gap-2 items-start">
                           <span className="font-sans wrap-break-words text-4xl font-black text-foreground sm:max-w-32 md:max-w-full">
